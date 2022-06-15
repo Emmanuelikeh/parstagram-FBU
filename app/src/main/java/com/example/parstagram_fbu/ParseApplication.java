@@ -14,6 +14,7 @@ public class ParseApplication extends Application {
 
 
         //Register my parse models
+        ParseObject.registerSubclass(Post.class);
 
     //        ParseObject.registerSubclass(Post.class);
         Parse.initialize(new Parse.Configuration.Builder(this)
