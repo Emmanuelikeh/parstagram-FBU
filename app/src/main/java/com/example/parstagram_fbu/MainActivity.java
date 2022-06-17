@@ -73,16 +73,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String description = activityMainBinding.etDescription.getText().toString();
                 if (description.isEmpty()){
-                    Toast.makeText(MainActivity.this,"Description cannot be empty",Toast.LENGTH_SHORT);
+                    Toast.makeText(MainActivity.this,"Description cannot be empty",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if(photoFile == null || activityMainBinding.ivPostImage.getDrawable() == null){
-                    Toast.makeText(MainActivity.this,"There is no image",Toast.LENGTH_SHORT);
+                    Toast.makeText(MainActivity.this,"There is no image",Toast.LENGTH_SHORT).show();
                     return;
 
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 savePost(description,currentUser,photoFile);
+
+
 
             }
         });
@@ -153,12 +155,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e != null){
-                    Log.e(TAG, "Error while saving");
+                    Log.e(TAG, "Error while saving",e);
                     Toast.makeText(MainActivity.this,"Error while saving ",Toast.LENGTH_SHORT);
                 }
-                Log.i(TAG, "Post save was successful!!");
-                activityMainBinding.etDescription.setText("");
-                activityMainBinding.ivPostImage.setImageResource(0);
+                else{
+                    Log.i(TAG, "Post save was successful!!");
+                    activityMainBinding.etDescription.setText("");
+                    activityMainBinding.ivPostImage.setImageResource(0);
+
+                    Intent i = new Intent(MainActivity.this, FeedActivity.class);
+                    startActivity(i);
+                }
 
             }
         });

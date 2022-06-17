@@ -2,6 +2,7 @@ package com.example.parstagram_fbu;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,7 @@ public class FeedActivity extends AppCompatActivity {
 
     private ActivityFeedBinding activityFeedBinding;
     public  static final String TAG = "FeesActivity";
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +39,32 @@ public class FeedActivity extends AppCompatActivity {
 
 
 
+
+
         // binding the giving our recyclerview our adapter
 
         activityFeedBinding.rvPosts.setAdapter(adapter);
         activityFeedBinding.rvPosts.setLayoutManager(new LinearLayoutManager(this));
+        swipeRefreshLayout = findViewById(R.id.swipeContainer);
+
+        activityFeedBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                adapter.clear();
+                queryPosts();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+        // Configure the refreshing colors
+        activityFeedBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         // query posts from Parstagram
         queryPosts();
@@ -48,6 +72,9 @@ public class FeedActivity extends AppCompatActivity {
 
 
     }
+
+
+
 
 
     private void queryPosts() {
