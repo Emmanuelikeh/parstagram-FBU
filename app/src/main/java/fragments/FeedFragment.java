@@ -1,14 +1,21 @@
-package com.example.parstagram_fbu;
+package fragments;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import com.example.parstagram_fbu.databinding.ActivityFeedBinding;
+import com.example.parstagram_fbu.Post;
+import com.example.parstagram_fbu.PostsAdapter;
+import com.example.parstagram_fbu.R;
+import com.example.parstagram_fbu.databinding.FragmentFeedBinding;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -16,38 +23,51 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FeedActivity extends AppCompatActivity {
 
+
+public class FeedFragment extends Fragment {
+
+    private FragmentFeedBinding fragmentFeedBinding;
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
-
-    private ActivityFeedBinding activityFeedBinding;
-    public  static final String TAG = "FeesActivity";
     private SwipeRefreshLayout swipeRefreshLayout;
+    public  static final String TAG = "PostFragment";
+
+
+
+    public FeedFragment() {
+        // Required empty public constructor
+    }
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_feed);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        fragmentFeedBinding = FragmentFeedBinding.inflate(getLayoutInflater(),container,false);
+        View view = fragmentFeedBinding.getRoot();
+        return view;
+//        return inflater.inflate(R.layout.fragment_feed, container, false);
+    }
 
-        activityFeedBinding = ActivityFeedBinding.inflate(getLayoutInflater());
-        View view = activityFeedBinding.getRoot();
-        setContentView(view);
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        fragmentFeedBinding = null;
 
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @NonNull Bundle savedInstancesState){
+        super.onViewCreated(view,savedInstancesState);
         allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(this,allPosts);
+        adapter = new PostsAdapter(getContext(),allPosts);
+        fragmentFeedBinding.rvPosts.setAdapter(adapter);
+        fragmentFeedBinding.rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        swipeRefreshLayout = view.findViewById(R.id.swipeContainer);
 
-
-
-
-        // binding the giving our recyclerview our adapter
-
-        activityFeedBinding.rvPosts.setAdapter(adapter);
-        activityFeedBinding.rvPosts.setLayoutManager(new LinearLayoutManager(this));
-        swipeRefreshLayout = findViewById(R.id.swipeContainer);
-
-        activityFeedBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        fragmentFeedBinding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 // Your code to refresh the list here.
@@ -61,23 +81,20 @@ public class FeedActivity extends AppCompatActivity {
         });
 
         // Configure the refreshing colors
-        activityFeedBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+        fragmentFeedBinding.swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
         // query posts from Parstagram
+
+
+
         queryPosts();
-
-
-
     }
 
 
-
-
-
-    private void queryPosts() {
+    protected void queryPosts() {
         // specify what type of data we want to query - Post.class
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         // include data referred by user key
